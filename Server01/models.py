@@ -1,4 +1,6 @@
 from django.db import models
+from webServer.settings import SYSTEM_PATH
+from Server01.util.auxiliaryFuction import check_and_delete
 
 
 class User(models.Model):
@@ -9,14 +11,17 @@ class User(models.Model):
     avatar = models.CharField(max_length=256, verbose_name='头像', null=False,
                               default='http://localhost:8000/static/img/avatar/defaultAvatar.jpg')
     signature = models.CharField(max_length=64, verbose_name='个性签名', default='暂时没有个性签名~', null=True)
+    # 用户关注，related_name获取用户的粉丝
     following = models.ManyToManyField('self', symmetrical=False, blank=True, related_name='beFocusOn')
-    followed = models.ManyToManyField('self', symmetrical=False, blank=True, related_name='focusOn')
+    # 用户喜爱的帖子
     favorites = models.ManyToManyField('Post', blank=True, related_name='favoritePosts')
+    # 用户收藏的帖子
     collected = models.ManyToManyField('Post', blank=True, related_name='collectedPosts')
 
 
 class Post(models.Model):
     """ 帖子表 """
+    # 用户通过related_name获取ta发的帖子
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
     title = models.CharField(max_length=64, verbose_name='标题', null=False)
     content = models.TextField(max_length=3000, verbose_name='内容', null=True)
@@ -25,7 +30,9 @@ class Post(models.Model):
     def delete(self, *args, **kwargs):
         # 删除关联的帖子图片
         self.imgs.all().delete()
-
+        # 删除帖子的图片的存储
+        path = SYSTEM_PATH + '/webServer/Server01/static/img/post/'
+        check_and_delete(path, self.id)
         # 删除帖子本身
         super().delete(*args, **kwargs)
 

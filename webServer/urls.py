@@ -19,12 +19,18 @@ from Server01.views import user, post, comment
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    # 用户相关
     path("login/", user.login),
     path('register/', user.register),
     path('index/', user.query_user_index),
+    path('focus/', user.focusOn),
+    path('user/focus/', user.get_user_focus),
+    path('user/unfollow/', user.unfollow),
+    # 帖子相关
     path('upload/', post.upload_post),
     path('upload/info/', post.upload_post_info),
     path('post/detail/', post.get_post_detail),
     path('post/', post.query_post_index),
+    # 评论相关
     path('comment/', comment.do_comment)
 ]

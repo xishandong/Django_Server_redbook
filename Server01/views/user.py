@@ -3,7 +3,8 @@ import json
 from django.http import JsonResponse
 
 import Server01.models as models
-from Server01.util.verifyJWT import create_token
+from Server01.util.auxiliaryFuction import check_email, combine_index_post
+from Server01.util.verifyJWT import create_token, authenticate_request
 
 
 # 用户登录
@@ -38,6 +39,7 @@ def register(request):
         return JsonResponse({'error': '创建用户失败'}, status=401)
 
 
+# 获取用户主页信息
 def query_user_index(request):
     data = json.loads(request.body)
     if data.get('id'):
@@ -49,7 +51,7 @@ def query_user_index(request):
                 'avatar': user.avatar,
                 'signature': user.signature,
                 'fans': user.beFocusOn.count(),
-                'focusOn': user.focusOn.count(),
+                'focusOn': user.following.count(),
                 'postsCount': user.posts.count(),
             }
             info = {
@@ -63,21 +65,40 @@ def query_user_index(request):
     return JsonResponse({'error': '非法访问'}, status=401)
 
 
-def combine_index_post(posts):
-    for post in posts:
-        imgs = post.imgs.all()
-        info = {
-            'title': post.title,
-            'id': post.id,
-            'img': imgs[0].imagePath,
-            'user': {
-                'id': post.user.id,
-                'username': post.user.username,
-                'avatar': post.user.avatar
-            }
-        }
-        yield info
+# 获取用户关注用户id
+@authenticate_request
+def get_user_focus(request, payload):
+    user_id = payload['user_id']
+    user = models.User.objects.filter(id=user_id).first()
+    following = user.following.all()
+    ids = [u.id for u in following]
+    return JsonResponse({'info': ids}, status=200)
 
 
-def check_email(email):
-    return models.User.objects.filter(email=email).exists()
+# 用户关注
+@authenticate_request
+def focusOn(request, payload):
+    # 做关注操作的用户id
+    id1 = payload['user_id']
+    user1 = models.User.objects.filter(id=id1).first()
+    # 被关注的用户id
+    id2 = json.loads(request.body)['id']
+    user2 = models.User.objects.filter(id=id2).first()
+    if user1 and user2:
+        user1.following.add(user2)
+        return JsonResponse({'info': '成功关注'}, status=200)
+    return JsonResponse({'error': '非法的操作'}, status=401)
+
+
+@authenticate_request
+def unfollow(request, payload):
+    # 取消关注操作的用户id
+    user_id = payload['user_id']
+    user = models.User.objects.filter(id=user_id).first()
+    # 被取消关注的用户id
+    unfollow_id = json.loads(request.body)['id']
+    unfollow_user = models.User.objects.filter(id=unfollow_id).first()
+    if user and unfollow_user:
+        user.following.remove(unfollow_user)
+        return JsonResponse({'info': '成功取消关注'}, status=200)
+    return JsonResponse({'error': '非法的操作'}, status=401)

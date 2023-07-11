@@ -1,18 +1,18 @@
 import json
 
 from django.http import JsonResponse
-from webServer.settings import TIME_ZONE
+from webServer.settings import TIME_ZONE, SYSTEM_PATH
 import Server01.models as models
 from Server01.util.verifyJWT import authenticate_request
-from Server01.util.auxiliaryFuction import convert_to_timezone
+from Server01.util.auxiliaryFuction import convert_to_timezone, combine_index_post
 
-system = 'D:/vue'
+
 
 
 def upload_post(request):
     file = request.FILES['file']
     id = request.POST.get('id')
-    file_path = system + '/webServer/Server01/static/img/post/' + str(id) + '-' + file.name
+    file_path = SYSTEM_PATH + '/webServer/Server01/static/img/post/' + str(id) + '-' + file.name
     with open(file_path, 'wb') as destination:
         for chunk in file.chunks():
             destination.write(chunk)
@@ -27,6 +27,7 @@ def upload_post(request):
     return JsonResponse({'error': '错误的操作'}, status=401)
 
 
+# 用户上传帖子
 @authenticate_request
 def upload_post_info(request, payload):
     data = json.loads(request.body)
@@ -38,6 +39,7 @@ def upload_post_info(request, payload):
     return JsonResponse({'data': 'success', 'info': post.id}, status=200)
 
 
+# 获取帖子详情，整合信息
 def get_post_detail(request):
     data = json.loads(request.body)
     id = data.get('id')
@@ -72,6 +74,7 @@ def get_post_detail(request):
     return JsonResponse({'error': '错误的访问'}, status=401)
 
 
+# 主页推送帖子
 def query_post_index(request):
     data = json.loads(request.body)
     offset = data['offset']
@@ -87,18 +90,3 @@ def query_post_index(request):
 
     return JsonResponse({'info': []}, status=200)
 
-
-def combine_index_post(posts):
-    for post in posts:
-        imgs = post.imgs.all()
-        info = {
-            'title': post.title,
-            'id': post.id,
-            'img': imgs[0].imagePath,
-            'user': {
-                'id': post.user.id,
-                'username': post.user.username,
-                'avatar': post.user.avatar
-            }
-        }
-        yield info

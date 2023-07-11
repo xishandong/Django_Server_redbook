@@ -141,7 +141,8 @@ CORS_ALLOWED_HEADERS = [
 # 启用 CSRF 保护
 CSRF_COOKIE_HTTPONLY = True
 
-
+# 配置保存文件路径
+SYSTEM_PATH = 'D:/vue'
 
 
 
