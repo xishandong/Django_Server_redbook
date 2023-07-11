@@ -48,7 +48,19 @@ def get_post_detail(request):
             'title': post.title,
             'id': post.id,
             'imgs': [img.imagePath for img in imgs],
-            'comment': [],
+            'comment': [
+                {
+                    'id': comment.id,
+                    'content': comment.content,
+                    'createTime': comment.created_at,
+                    'user': {
+                        'id': comment.user.id,
+                        'username': comment.user.username,
+                        'avatar': comment.user.avatar
+                    }
+
+                } for comment in post.comments.all()
+            ],
             'user': {
                 'id': post.user.id,
                 'username': post.user.username,

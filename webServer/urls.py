@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from Server01.views import user, post
+from Server01.views import user, post, comment
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -25,5 +25,6 @@ urlpatterns = [
     path('upload/', post.upload_post),
     path('upload/info/', post.upload_post_info),
     path('post/detail/', post.get_post_detail),
-    path('post/', post.query_post_index)
+    path('post/', post.query_post_index),
+    path('comment/', comment.do_comment)
 ]
