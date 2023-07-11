@@ -79,8 +79,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'server01',
         'USER': 'root',
-        'PASSWORD': '******',
-        'HOST': '******',
+        'PASSWORD': '!d0x9sDXS',
+        'HOST': '113.125.109.60',
         'PORT': '3306',
     }
 }
@@ -108,7 +108,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "zh-hans"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 
@@ -140,7 +140,6 @@ CORS_ALLOWED_HEADERS = [
 
 # 启用 CSRF 保护
 CSRF_COOKIE_HTTPONLY = True
-
 
 
 

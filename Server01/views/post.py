@@ -1,9 +1,10 @@
 import json
 
 from django.http import JsonResponse
-
+from webServer.settings import TIME_ZONE
 import Server01.models as models
 from Server01.util.verifyJWT import authenticate_request
+from Server01.util.auxiliaryFuction import convert_to_timezone
 
 system = 'D:/vue'
 
@@ -12,7 +13,6 @@ def upload_post(request):
     file = request.FILES['file']
     id = request.POST.get('id')
     file_path = system + '/webServer/Server01/static/img/post/' + str(id) + '-' + file.name
-    print(id, file_path)
     with open(file_path, 'wb') as destination:
         for chunk in file.chunks():
             destination.write(chunk)
@@ -52,7 +52,7 @@ def get_post_detail(request):
                 {
                     'id': comment.id,
                     'content': comment.content,
-                    'createTime': comment.created_at,
+                    'createTime': convert_to_timezone(comment.created_at, TIME_ZONE),
                     'user': {
                         'id': comment.user.id,
                         'username': comment.user.username,
@@ -66,7 +66,7 @@ def get_post_detail(request):
                 'username': post.user.username,
                 'avatar': post.user.avatar
             },
-            'createTime': post.created_at
+            'createTime': convert_to_timezone(post.created_at, TIME_ZONE)
         }
         return JsonResponse({'info': info}, status=200)
     return JsonResponse({'error': '错误的访问'}, status=401)
