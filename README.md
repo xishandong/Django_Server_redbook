@@ -11,6 +11,11 @@ pip install django-cors-headers
 pip insatll mysqlclient
 ```
 
+#### 使用
+需要在settings中修改数据库的配置信息
+
+配置你自己的端口号等信息
+
 #### 功能
 用户登录
 
@@ -21,5 +26,7 @@ pip insatll mysqlclient
 帖子详情
 
 用户主页
+
+用户评论
 
 未完待续
