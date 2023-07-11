@@ -15,8 +15,7 @@ def authenticate_request(view_func):
             token = request.headers.get('Authorization').split(' ')[1]
             verify_payload = jwt.decode(token, SECRET_KEY, ['HS256'], verify=True)
             # 检查数据库是否存在该用户
-            if models.User.objects.filter(username=verify_payload.get('username'),
-                                          id=verify_payload.get('user_id')).exists():
+            if models.User.objects.filter(id=verify_payload.get('user_id')).exists():
                 return view_func(request, verify_payload, *args, **kwargs)
             return JsonResponse({'error': '未授权访问'}, status=401)
         except exceptions.ExpiredSignatureError:
@@ -45,7 +44,7 @@ def create_token(user):
     payload = {
         'user_id': user.id,
         'username': user.username,
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)  # 设置过期时间
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60)  # 设置过期时间
     }
     result = jwt.encode(payload=payload, key=SECRET_KEY, algorithm='HS256', headers=headers)
     return result

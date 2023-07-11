@@ -1,15 +1,15 @@
 import json
 
 from django.http import JsonResponse
-from webServer.settings import TIME_ZONE, SYSTEM_PATH
+
 import Server01.models as models
-from Server01.util.verifyJWT import authenticate_request
 from Server01.util.auxiliaryFuction import convert_to_timezone, combine_index_post
+from Server01.util.verifyJWT import authenticate_request
+from webServer.settings import TIME_ZONE, SYSTEM_PATH
 
 
-
-
-def upload_post(request):
+@authenticate_request
+def upload_post(request, payload):
     file = request.FILES['file']
     id = request.POST.get('id')
     file_path = SYSTEM_PATH + '/webServer/Server01/static/img/post/' + str(id) + '-' + file.name
@@ -89,4 +89,3 @@ def query_post_index(request):
         return JsonResponse({'info': list(combine_index_post(posts))}, status=200)
 
     return JsonResponse({'info': []}, status=200)
-

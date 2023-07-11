@@ -29,4 +29,6 @@ pip insatll mysqlclient
 
 用户评论
 
+用户更新个人信息
+
 未完待续

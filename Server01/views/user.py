@@ -3,8 +3,9 @@ import json
 from django.http import JsonResponse
 
 import Server01.models as models
-from Server01.util.auxiliaryFuction import check_email, combine_index_post
+from Server01.util.auxiliaryFuction import check_email, combine_index_post, check_and_delete
 from Server01.util.verifyJWT import create_token, authenticate_request
+from webServer.settings import SYSTEM_PATH
 
 
 # 用户登录
@@ -102,3 +103,33 @@ def unfollow(request, payload):
         user.following.remove(unfollow_user)
         return JsonResponse({'info': '成功取消关注'}, status=200)
     return JsonResponse({'error': '非法的操作'}, status=401)
+
+
+@authenticate_request
+def update_user_info(request, payload):
+    data = json.loads(request.body)
+    user_id = payload['user_id']
+    user = models.User.objects.filter(id=user_id).first()
+    user.username = data['username']
+    user.signature = data['signature']
+    user.save()
+    return JsonResponse({'info': '修改成功'}, status=200)
+
+
+@authenticate_request
+def update_avatar(request, payload):
+    file = request.FILES['file']
+    id = payload['user_id']
+    file_path = SYSTEM_PATH + '/webServer/Server01/static/img/avatar/' + str(id) + '-' + file.name
+    check_and_delete(id, SYSTEM_PATH + '/webServer/Server01/static/img/avatar/')
+    with open(file_path, 'wb') as destination:
+        for chunk in file.chunks():
+            destination.write(chunk)
+    result = {
+        'filename': file.name,
+        'filepath': 'http://localhost:8000/static/img/avatar/' + str(id) + '-' + file.name,
+    }
+    user = models.User.objects.filter(id=id).first()
+    user.avatar = 'http://localhost:8000/static/img/avatar/' + str(id) + '-' + file.name
+    user.save()
+    return JsonResponse({'info': result}, status=200)

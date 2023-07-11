@@ -26,6 +26,8 @@ urlpatterns = [
     path('focus/', user.focusOn),
     path('user/focus/', user.get_user_focus),
     path('user/unfollow/', user.unfollow),
+    path('user/update/', user.update_user_info),
+    path('user/avatar/', user.update_avatar),
     # 帖子相关
     path('upload/', post.upload_post),
     path('upload/info/', post.upload_post_info),
