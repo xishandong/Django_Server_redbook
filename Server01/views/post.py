@@ -4,7 +4,7 @@ from django.db.models import Q
 from django.http import JsonResponse
 
 import Server01.models as models
-from Server01.util.auxiliaryFuction import convert_to_timezone, combine_index_post
+from Server01.util.auxiliaryFuction import convert_to_timezone, combine_index_post, filter_querySet
 from Server01.util.verifyJWT import authenticate_request
 from webServer.settings import TIME_ZONE, SYSTEM_PATH
 
@@ -69,7 +69,9 @@ def get_post_detail(request):
                 'username': post.user.username,
                 'avatar': post.user.avatar
             },
-            'createTime': convert_to_timezone(post.created_at, TIME_ZONE)
+            'createTime': convert_to_timezone(post.created_at, TIME_ZONE),
+            'likeCount': post.favoritePosts.all().count(),
+            'collectCount': post.collectedPosts.all().count(),
         }
         return JsonResponse({'info': info}, status=200)
     return JsonResponse({'error': '错误的访问'}, status=404)
@@ -80,7 +82,6 @@ def query_post_index(request):
     data = json.loads(request.body)
     offset = data['offset']
     query = data.get('query')
-    limit = 20  # 每页显示的帖子数量
     if query:
         posts = models.Post.objects.filter(
             Q(title__icontains=query) |
@@ -89,12 +90,33 @@ def query_post_index(request):
         )
     else:
         posts = models.Post.objects.all()
-    count = posts.count()
-
-    if 0 <= offset < count:
-        start = offset
-        end = offset + limit
-        posts = posts.order_by('-id')[start:end]
+    posts = filter_querySet(posts, offset, limit=10)
+    if posts:
         return JsonResponse({'info': list(combine_index_post(posts))}, status=200)
-
+    # 没有内容了
     return JsonResponse({'info': []}, status=200)
+
+
+@authenticate_request
+def control_like_collect(request, payload):
+    user_id = payload['user_id']
+    data = json.loads(request.body)
+    operation = data['operator']
+    post_id = data['post_id']
+    types = data['type']
+    user = models.User.objects.filter(id=user_id).first()
+    post = models.Post.objects.filter(id=post_id).first()
+    if user and post:
+        if types == 'like':
+            if not operation:
+                user.favorites.add(post)
+                return JsonResponse({'info': '成功添加喜欢'}, status=200)
+            user.favorites.remove(post)
+            return JsonResponse({'info': '成功取消喜欢'}, status=200)
+        elif types == 'collect':
+            if not operation:
+                user.collected.add(post)
+                return JsonResponse({'info': '成功添加收藏'}, status=200)
+            user.collected.remove(post)
+            return JsonResponse({'info': '成功取消收藏'}, status=200)
+    return JsonResponse({'error': '错误的操作'}, status=404)

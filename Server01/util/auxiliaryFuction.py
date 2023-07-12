@@ -43,3 +43,14 @@ def check_and_delete(id, mainPath):
         if file_name.startswith(f'{id}-'):
             file_path = os.path.join(mainPath, file_name)
             os.remove(file_path)
+
+
+def filter_querySet(querySet, offset, limit=20):
+    limit = limit  # 每页显示的帖子数量
+    count = querySet.count()
+    if 0 <= offset < count:
+        start = offset
+        end = offset + limit
+        filterQuerySet = querySet.order_by('-id')[start:end]
+        return filterQuerySet
+    return []

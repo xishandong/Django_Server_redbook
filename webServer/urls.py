@@ -28,11 +28,13 @@ urlpatterns = [
     path('user/unfollow/', user.unfollow),
     path('user/update/', user.update_user_info),
     path('user/avatar/', user.update_avatar),
+    path('user/post/', user.query_user_index_post),
     # 帖子相关
     path('upload/', post.upload_post),
     path('upload/info/', post.upload_post_info),
     path('post/detail/', post.get_post_detail),
     path('post/', post.query_post_index),
+    path('post/control/', post.control_like_collect),
     # 评论相关
     path('comment/', comment.do_comment)
 ]

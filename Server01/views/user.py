@@ -3,7 +3,7 @@ import json
 from django.http import JsonResponse
 
 import Server01.models as models
-from Server01.util.auxiliaryFuction import check_email, combine_index_post, check_and_delete
+from Server01.util.auxiliaryFuction import check_email, combine_index_post, check_and_delete, filter_querySet
 from Server01.util.verifyJWT import create_token, authenticate_request
 from webServer.settings import SYSTEM_PATH
 
@@ -40,10 +40,10 @@ def register(request):
         return JsonResponse({'error': '创建用户失败'}, status=401)
 
 
-# 获取用户主页信息
+# 获取用户主页的个人信息
 def query_user_index(request):
     data = json.loads(request.body)
-    if data.get('id'):
+    if data.get('id') and data.get('id') != 'undefined':
         user = models.User.objects.filter(id=data.get('id')).first()
         if user:
             author = {
@@ -57,13 +57,31 @@ def query_user_index(request):
             }
             info = {
                 'user': author,
-                'posts': list(combine_index_post(user.posts.all())),
-                'collected': list(combine_index_post(user.collected.all())),
-                'favorites': list(combine_index_post(user.favorites.all()))
             }
             return JsonResponse({'data': info}, status=200)
         return JsonResponse({'error': '错误的访问'}, status=404)
     return JsonResponse({'error': '非法访问'}, status=404)
+
+
+def query_user_index_post(request):
+    type_mapping = {
+        '帖子': 'posts',
+        '点赞': 'favorites',
+        '收藏': 'collected',
+    }
+    data = json.loads(request.body)
+    user_id = data['user_id']
+    types = data['types']
+    offset = data['offset']
+    user = models.User.objects.filter(id=user_id).first()
+    if user and types in type_mapping:
+        field_name = type_mapping[types]
+        postObj = getattr(user, field_name).all()
+        posts = filter_querySet(postObj, offset, limit=10)
+        if posts:
+            return JsonResponse({'info': list(combine_index_post(posts))}, status=200)
+        return JsonResponse({'info': []}, status=200)
+    return JsonResponse({'error': '错误访问'}, status=404)
 
 
 # 获取用户关注用户id
@@ -73,7 +91,13 @@ def get_user_focus(request, payload):
     user = models.User.objects.filter(id=user_id).first()
     following = user.following.all()
     ids = [u.id for u in following]
-    return JsonResponse({'info': ids}, status=200)
+    collected = user.collected.all()
+    c_ids = [u.id for u in collected]
+    favorites = user.favorites.all()
+    f_ids = [u.id for u in favorites]
+    return JsonResponse({'info': {
+        'follow': ids, 'collected': c_ids, 'favorites': f_ids
+    }}, status=200)
 
 
 # 用户关注
