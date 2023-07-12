@@ -62,8 +62,8 @@ def query_user_index(request):
                 'favorites': list(combine_index_post(user.favorites.all()))
             }
             return JsonResponse({'data': info}, status=200)
-        return JsonResponse({'error': '错误的访问'}, status=401)
-    return JsonResponse({'error': '非法访问'}, status=401)
+        return JsonResponse({'error': '错误的访问'}, status=404)
+    return JsonResponse({'error': '非法访问'}, status=404)
 
 
 # 获取用户关注用户id
@@ -120,8 +120,8 @@ def update_user_info(request, payload):
 def update_avatar(request, payload):
     file = request.FILES['file']
     id = payload['user_id']
-    file_path = SYSTEM_PATH + '/webServer/Server01/static/img/avatar/' + str(id) + '-' + file.name
-    check_and_delete(id, SYSTEM_PATH + '/webServer/Server01/static/img/avatar/')
+    file_path = SYSTEM_PATH + 'avatar/' + str(id) + '-' + file.name
+    check_and_delete(id, SYSTEM_PATH + 'avatar/')
     with open(file_path, 'wb') as destination:
         for chunk in file.chunks():
             destination.write(chunk)

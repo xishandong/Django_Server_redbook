@@ -79,8 +79,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'server01',
         'USER': 'root',
-        'PASSWORD': '******',
-        'HOST': '******',
+        'PASSWORD': '!d0x9sDXS',
+        'HOST': '113.125.109.60',
         'PORT': '3306',
     }
 }
@@ -126,6 +126,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
+    'http://127.0.0.1:5173'
 ]
 
 CORS_ALLOWED_METHODS = [
@@ -138,11 +139,8 @@ CORS_ALLOWED_HEADERS = [
     'Content-Type',
 ]
 
-# 启用 CSRF 保护
-CSRF_COOKIE_HTTPONLY = True
-
 # 配置保存文件路径
-SYSTEM_PATH = 'D:/vue'
+SYSTEM_PATH = 'D:/vue/webServer/Server01/static/img/'
 
 
 
