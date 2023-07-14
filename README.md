@@ -31,4 +31,6 @@ pip insatll mysqlclient
 
 用户更新个人信息
 
+用户帖子管理
+
 未完待续
