@@ -36,5 +36,6 @@ urlpatterns = [
     path('post/', post.query_post_index),
     path('post/control/', post.control_like_collect),
     # 评论相关
-    path('comment/', comment.do_comment)
+    path('comment/', comment.do_comment),
+    path('comment/main/', comment.get_comment)
 ]

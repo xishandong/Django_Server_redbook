@@ -51,19 +51,6 @@ def get_post_detail(request):
             'title': post.title,
             'id': post.id,
             'imgs': [img.imagePath for img in imgs],
-            'comment': [
-                {
-                    'id': comment.id,
-                    'content': comment.content,
-                    'createTime': convert_to_timezone(comment.created_at, TIME_ZONE),
-                    'user': {
-                        'id': comment.user.id,
-                        'username': comment.user.username,
-                        'avatar': comment.user.avatar
-                    }
-
-                } for comment in post.comments.all()
-            ],
             'user': {
                 'id': post.user.id,
                 'username': post.user.username,
@@ -72,6 +59,7 @@ def get_post_detail(request):
             'createTime': convert_to_timezone(post.created_at, TIME_ZONE),
             'likeCount': post.favoritePosts.all().count(),
             'collectCount': post.collectedPosts.all().count(),
+            'commentCount': post.comments.all().count(),
         }
         return JsonResponse({'info': info}, status=200)
     return JsonResponse({'error': '错误的访问'}, status=404)
