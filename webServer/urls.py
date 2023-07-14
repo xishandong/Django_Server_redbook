@@ -29,12 +29,14 @@ urlpatterns = [
     path('user/update/', user.update_user_info),
     path('user/avatar/', user.update_avatar),
     path('user/post/', user.query_user_index_post),
+    path('user/post/control/', user.user_post_control_index),
     # 帖子相关
     path('upload/', post.upload_post),
     path('upload/info/', post.upload_post_info),
     path('post/detail/', post.get_post_detail),
     path('post/', post.query_post_index),
     path('post/control/', post.control_like_collect),
+    path('post/delete/', post.post_delete),
     # 评论相关
     path('comment/', comment.do_comment),
     path('comment/main/', comment.get_comment)

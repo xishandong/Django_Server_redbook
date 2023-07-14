@@ -32,7 +32,7 @@ class Post(models.Model):
         self.imgs.all().delete()
         # 删除帖子的图片的存储
         path = SYSTEM_PATH + 'post/'
-        check_and_delete(path, self.id)
+        check_and_delete(mainPath=path, id=self.id)
         # 删除帖子本身
         super().delete(*args, **kwargs)
 

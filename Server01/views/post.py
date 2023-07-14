@@ -60,6 +60,7 @@ def get_post_detail(request):
             'likeCount': post.favoritePosts.all().count(),
             'collectCount': post.collectedPosts.all().count(),
             'commentCount': post.comments.all().count(),
+            'content': post.content
         }
         return JsonResponse({'info': info}, status=200)
     return JsonResponse({'error': '错误的访问'}, status=404)
@@ -108,3 +109,14 @@ def control_like_collect(request, payload):
             user.collected.remove(post)
             return JsonResponse({'info': '成功取消收藏'}, status=200)
     return JsonResponse({'error': '错误的操作'}, status=404)
+
+
+@authenticate_request
+def post_delete(request, payload):
+    data = json.loads(request.body)
+    id = data['id']
+    post = models.Post.objects.filter(id=id).first()
+    if post.user.id == payload['user_id']:
+        post.delete()
+        return JsonResponse({'success': '帖子删除成功'}, status=200)
+    return JsonResponse({'error': '错误操作'}, status=404)

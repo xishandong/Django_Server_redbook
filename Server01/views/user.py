@@ -3,9 +3,10 @@ import json
 from django.http import JsonResponse
 
 import Server01.models as models
-from Server01.util.auxiliaryFuction import check_email, combine_index_post, check_and_delete, filter_querySet
+from Server01.util.auxiliaryFuction import check_email, combine_index_post, check_and_delete, filter_querySet, \
+    convert_to_timezone
 from Server01.util.verifyJWT import create_token, authenticate_request
-from webServer.settings import SYSTEM_PATH
+from webServer.settings import SYSTEM_PATH, TIME_ZONE
 
 
 # 用户登录
@@ -145,7 +146,7 @@ def update_avatar(request, payload):
     file = request.FILES['file']
     id = payload['user_id']
     file_path = SYSTEM_PATH + 'avatar/' + str(id) + '-' + file.name
-    check_and_delete(id, SYSTEM_PATH + 'avatar/')
+    check_and_delete(id=id, mainPath=SYSTEM_PATH + 'avatar/')
     with open(file_path, 'wb') as destination:
         for chunk in file.chunks():
             destination.write(chunk)
@@ -157,3 +158,22 @@ def update_avatar(request, payload):
     user.avatar = 'http://localhost:8000/static/img/avatar/' + str(id) + '-' + file.name
     user.save()
     return JsonResponse({'info': result}, status=200)
+
+
+@authenticate_request
+def user_post_control_index(request, payload):
+    user_id = payload['user_id']
+    user = models.User.objects.filter(id=user_id).first()
+    if user:
+        user_post = user.posts.all()
+        info = [{
+            'date': convert_to_timezone(post.created_at, TIME_ZONE),
+            'title': post.title,
+            'likeCount': post.favoritePosts.all().count(),
+            'collectCount': post.collectedPosts.all().count(),
+            'commentCount': post.comments.all().count(),
+            'content': post.content,
+            'id': post.id
+        } for post in user_post if post]
+        return JsonResponse({'info': info}, status=200)
+    return JsonResponse({'error': '错误的操作'}, status=404)
