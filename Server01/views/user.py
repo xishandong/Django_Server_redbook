@@ -163,9 +163,11 @@ def update_avatar(request, payload):
 @authenticate_request
 def user_post_control_index(request, payload):
     user_id = payload['user_id']
+    offset = json.loads(request.body)['offset']
     user = models.User.objects.filter(id=user_id).first()
     if user:
         user_post = user.posts.all()
+        clear_user_post = filter_querySet(user_post, offset, 10)
         info = [{
             'date': convert_to_timezone(post.created_at, TIME_ZONE),
             'title': post.title,
@@ -174,6 +176,6 @@ def user_post_control_index(request, payload):
             'commentCount': post.comments.all().count(),
             'content': post.content,
             'id': post.id
-        } for post in user_post if post]
-        return JsonResponse({'info': info}, status=200)
+        } for post in clear_user_post if post]
+        return JsonResponse({'info': info, 'total': user_post.count()}, status=200)
     return JsonResponse({'error': '错误的操作'}, status=404)
