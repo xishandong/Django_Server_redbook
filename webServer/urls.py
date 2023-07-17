@@ -41,5 +41,6 @@ urlpatterns = [
     path('post/delete/', post.post_delete),
     # 评论相关
     path('comment/', comment.do_comment),
-    path('comment/main/', comment.get_comment)
+    path('comment/main/', comment.get_comment),
+    path('comment/reply/', comment.load_reply)
 ]
