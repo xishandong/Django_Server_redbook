@@ -77,7 +77,7 @@ def query_user_index_post(request):
     user = models.User.objects.filter(id=user_id).first()
     if user and types in type_mapping:
         field_name = type_mapping[types]
-        postObj = getattr(user, field_name).all()
+        postObj = getattr(user, field_name)
         posts = filter_querySet(postObj, offset, limit=10)
         if posts:
             return JsonResponse({'info': list(combine_index_post(posts))}, status=200)
@@ -183,19 +183,19 @@ def user_control_index(request, payload):
     user = models.User.objects.filter(id=user_id).first()
     if user:
         if types == 'posts':
-            user_data = user.posts.all()
+            user_data = user.posts
             info = get_user_post_info(user_data, offset)
         elif types == 'collected':
-            user_data = user.collected.all()
+            user_data = user.collected
             info = get_user_post_info(user_data, offset)
         elif types == 'favorites':
-            user_data = user.favorites.all()
+            user_data = user.favorites
             info = get_user_post_info(user_data, offset)
         elif types == 'fans':
-            user_data = user.beFocusOn.all()
+            user_data = user.beFocusOn
             info = get_user_info(user_data, offset)
         elif types == 'follow':
-            user_data = user.following.all()
+            user_data = user.following
             info = get_user_info(user_data, offset)
         else:
             return JsonResponse({'error': '错误的操作'}, status=404)

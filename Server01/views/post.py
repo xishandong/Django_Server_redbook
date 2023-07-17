@@ -57,9 +57,9 @@ def get_post_detail(request):
                 'avatar': post.user.avatar
             },
             'createTime': convert_to_timezone(post.created_at, TIME_ZONE),
-            'likeCount': post.favoritePosts.all().count(),
-            'collectCount': post.collectedPosts.all().count(),
-            'commentCount': post.comments.all().count(),
+            'likeCount': post.favoritePosts.count(),
+            'collectCount': post.collectedPosts.count(),
+            'commentCount': post.comments.count(),
             'content': post.content
         }
         return JsonResponse({'info': info}, status=200)
@@ -78,7 +78,7 @@ def query_post_index(request):
             Q(content__icontains=query)
         )
     else:
-        posts = models.Post.objects.all()
+        posts = models.Post.objects
     posts = filter_querySet(posts, offset, limit=10)
     if posts:
         return JsonResponse({'info': list(combine_index_post(posts))}, status=200)

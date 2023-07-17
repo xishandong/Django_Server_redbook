@@ -49,7 +49,7 @@ def load_reply(request):
     offset = data['offset']
     comment = Comment.objects.filter(id=id).first()
     if comment:
-        replies = comment.replies.all()
+        replies = comment.replies
         filter_replies = filter_querySet(replies, offset, limit=5)
         data = [
             {
