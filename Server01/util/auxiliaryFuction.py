@@ -3,6 +3,7 @@ import os
 import pytz
 
 import Server01.models as models
+from webServer.settings import TIME_ZONE
 
 
 # 更换时区
@@ -54,3 +55,33 @@ def filter_querySet(querySet, offset, limit=20):
         filterQuerySet = querySet.order_by('-id')[start:end]
         return filterQuerySet
     return []
+
+
+def get_user_post_info(posts, offset):
+    clear_posts = filter_querySet(posts, offset, 10)
+    info = [{
+        'date': convert_to_timezone(post.created_at, TIME_ZONE),
+        'title': post.title,
+        'likeCount': post.favoritePosts.count(),
+        'collectCount': post.collectedPosts.count(),
+        'commentCount': post.comments.count(),
+        'content': post.content,
+        'id': post.id,
+        'username': post.user.username,
+    } for post in clear_posts if post]
+    return info
+
+
+def get_user_info(users, offset):
+    clear_users = filter_querySet(users, offset, 10)
+    info = [
+        {
+            'username': user.username,
+            'avatar': user.avatar,
+            'id': user.id,
+            'fans': user.beFocusOn.count(),
+            'follow': user.following.count(),
+            'note': user.posts.count()
+        } for user in clear_users
+    ]
+    return info

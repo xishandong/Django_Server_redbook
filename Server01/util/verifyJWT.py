@@ -25,6 +25,7 @@ def authenticate_request(view_func):
             error_message = {'error': '非法的token'}
             return JsonResponse(error_message, status=401)
         except AttributeError as e:
+            print(e)
             error_message = {'error': '未查询到登录信息，请重新登录'}
             return JsonResponse(error_message, status=403)
 

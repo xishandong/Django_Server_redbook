@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+
 from Server01.views import user, post, comment
 
 urlpatterns = [
@@ -29,7 +30,8 @@ urlpatterns = [
     path('user/update/', user.update_user_info),
     path('user/avatar/', user.update_avatar),
     path('user/post/', user.query_user_index_post),
-    path('user/post/control/', user.user_post_control_index),
+    path('user/post/control/', user.user_control_index),
+    path('user/remove/fan/', user.remove_fans),
     # 帖子相关
     path('upload/', post.upload_post),
     path('upload/info/', post.upload_post_info),

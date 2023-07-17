@@ -4,7 +4,7 @@ from django.http import JsonResponse
 
 import Server01.models as models
 from Server01.util.auxiliaryFuction import check_email, combine_index_post, check_and_delete, filter_querySet, \
-    convert_to_timezone
+    convert_to_timezone, get_user_post_info, get_user_info
 from Server01.util.verifyJWT import create_token, authenticate_request
 from webServer.settings import SYSTEM_PATH, TIME_ZONE
 
@@ -131,6 +131,20 @@ def unfollow(request, payload):
 
 
 @authenticate_request
+def remove_fans(request, payload):
+    # 移除操作的用户id
+    user_id = payload['user_id']
+    user = models.User.objects.filter(id=user_id).first()
+    # 移除的粉丝id
+    fans_id = json.loads(request.body)['id']
+    fan = models.User.objects.filter(id=fans_id).first()
+    if user and fan:
+        fan.following.remove(user)
+        return JsonResponse({'info': '成功移除粉丝'}, status=200)
+    return JsonResponse({'error': '非法的操作'}, status=401)
+
+
+@authenticate_request
 def update_user_info(request, payload):
     data = json.loads(request.body)
     user_id = payload['user_id']
@@ -161,21 +175,34 @@ def update_avatar(request, payload):
 
 
 @authenticate_request
-def user_post_control_index(request, payload):
+def user_control_index(request, payload):
     user_id = payload['user_id']
-    offset = json.loads(request.body)['offset']
+    data = json.loads(request.body)
+    offset = data['offset']
+    types = data['types']
     user = models.User.objects.filter(id=user_id).first()
     if user:
-        user_post = user.posts.all()
-        clear_user_post = filter_querySet(user_post, offset, 10)
-        info = [{
-            'date': convert_to_timezone(post.created_at, TIME_ZONE),
-            'title': post.title,
-            'likeCount': post.favoritePosts.all().count(),
-            'collectCount': post.collectedPosts.all().count(),
-            'commentCount': post.comments.all().count(),
-            'content': post.content,
-            'id': post.id
-        } for post in clear_user_post if post]
-        return JsonResponse({'info': info, 'total': user_post.count()}, status=200)
+        if types == 'posts':
+            user_data = user.posts.all()
+            info = get_user_post_info(user_data, offset)
+        elif types == 'collected':
+            user_data = user.collected.all()
+            info = get_user_post_info(user_data, offset)
+        elif types == 'favorites':
+            user_data = user.favorites.all()
+            info = get_user_post_info(user_data, offset)
+        elif types == 'fans':
+            user_data = user.beFocusOn.all()
+            info = get_user_info(user_data, offset)
+        elif types == 'follow':
+            user_data = user.following.all()
+            info = get_user_info(user_data, offset)
+        else:
+            return JsonResponse({'error': '错误的操作'}, status=404)
+        total = user_data.count()
+        return JsonResponse({'info': info, 'total': total}, status=200)
     return JsonResponse({'error': '错误的操作'}, status=404)
+
+
+
+
