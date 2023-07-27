@@ -124,7 +124,5 @@ def post_delete(request, payload):
         if post.user.id == payload['user_id']:
             post.delete()
             return JsonResponse({'success': '帖子删除成功'}, status=200)
-        print(payload)
-    print(data, post)
-    #     return JsonResponse({'error': '错误操作'}, status=404)
-    # return JsonResponse({'error': '未查询到帖子信息'}, status=404)
+        return JsonResponse({'error': '错误'}, status=401)
+    return JsonResponse({'error': '错误'}, status=401)

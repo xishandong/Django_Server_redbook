@@ -35,7 +35,7 @@ def register(request):
         return JsonResponse({'error': '该邮箱已被注册'}, status=401)
     try:
         models.User.objects.create(**data)
-        return JsonResponse({'username': data})
+        return JsonResponse({'info': '创建用户成功'})
     except Exception as e:
         print(e)
         return JsonResponse({'error': '创建用户失败'}, status=401)
