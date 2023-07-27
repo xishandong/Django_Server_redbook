@@ -40,6 +40,8 @@ class Post(models.Model):
 class Image(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='imgs')
     imagePath = models.CharField(max_length=256, verbose_name='帖子图片')
+    height = models.IntegerField(default=0, verbose_name='图片高度')
+    width = models.IntegerField(default=0, verbose_name='图片宽度')
 
 
 class Comment(models.Model):

@@ -1,5 +1,6 @@
 import json
 
+from PIL import Image
 from django.db.models import Q
 from django.http import JsonResponse
 
@@ -14,6 +15,9 @@ def upload_post(request, payload):
     file = request.FILES['file']
     id = request.POST.get('id')
     file_path = SYSTEM_PATH + 'post/' + str(id) + '-' + file.name
+    with Image.open(file) as img:
+        image_height = img.height
+        image_width = img.width
     with open(file_path, 'wb') as destination:
         for chunk in file.chunks():
             destination.write(chunk)
@@ -23,7 +27,7 @@ def upload_post(request, payload):
     }
     post = models.Post.objects.filter(id=id).first()
     if post:
-        models.Image.objects.create(imagePath=result['filepath'], post=post)
+        models.Image.objects.create(imagePath=result['filepath'], post=post, height=image_height, width=image_width)
         return JsonResponse({'data': 'success'}, status=200)
     return JsonResponse({'error': '错误的操作'}, status=401)
 
@@ -79,7 +83,7 @@ def query_post_index(request):
         )
     else:
         posts = models.Post.objects
-    posts = filter_querySet(posts, offset, limit=10)
+    posts = filter_querySet(posts, offset, limit=5)
     if posts:
         return JsonResponse({'info': list(combine_index_post(posts))}, status=200)
     # 没有内容了
@@ -116,7 +120,11 @@ def post_delete(request, payload):
     data = json.loads(request.body)
     id = data['id']
     post = models.Post.objects.filter(id=id).first()
-    if post.user.id == payload['user_id']:
-        post.delete()
-        return JsonResponse({'success': '帖子删除成功'}, status=200)
-    return JsonResponse({'error': '错误操作'}, status=404)
+    if post:
+        if post.user.id == payload['user_id']:
+            post.delete()
+            return JsonResponse({'success': '帖子删除成功'}, status=200)
+        print(payload)
+    print(data, post)
+    #     return JsonResponse({'error': '错误操作'}, status=404)
+    # return JsonResponse({'error': '未查询到帖子信息'}, status=404)

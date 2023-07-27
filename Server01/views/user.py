@@ -4,9 +4,9 @@ from django.http import JsonResponse
 
 import Server01.models as models
 from Server01.util.auxiliaryFuction import check_email, combine_index_post, check_and_delete, filter_querySet, \
-    convert_to_timezone, get_user_post_info, get_user_info
+    get_user_post_info, get_user_info
 from Server01.util.verifyJWT import create_token, authenticate_request
-from webServer.settings import SYSTEM_PATH, TIME_ZONE
+from webServer.settings import SYSTEM_PATH
 
 
 # 用户登录
@@ -202,7 +202,3 @@ def user_control_index(request, payload):
         total = user_data.count()
         return JsonResponse({'info': info, 'total': total}, status=200)
     return JsonResponse({'error': '错误的操作'}, status=404)
-
-
-
-

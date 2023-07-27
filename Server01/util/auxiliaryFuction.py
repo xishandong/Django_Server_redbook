@@ -26,6 +26,10 @@ def combine_index_post(posts):
             'title': post.title,
             'id': post.id,
             'img': imgs[0].imagePath,
+            'img_info': {
+                'height': imgs[0].height,
+                'width': imgs[0].width,
+            },
             'user': {
                 'id': post.user.id,
                 'username': post.user.username,
