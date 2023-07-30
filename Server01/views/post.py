@@ -83,7 +83,7 @@ def query_post_index(request):
         )
     else:
         posts = models.Post.objects
-    posts = filter_querySet(posts, offset, limit=5)
+    posts = filter_querySet(posts, offset, limit=10)
     if posts:
         return JsonResponse({'info': list(combine_index_post(posts))}, status=200)
     # 没有内容了
