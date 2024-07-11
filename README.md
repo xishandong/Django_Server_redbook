@@ -1,5 +1,6 @@
 ### Django后端
-
+#### 我的个人博客
+[回锅炒辣椒的个人博客](https://www.xsblog.site/)
 #### 此项目是该项目配套后端
 
 [vue3+element-plus 仿小红书Web前端](https://github.com/xishandong/Vue3_web_redbook)
