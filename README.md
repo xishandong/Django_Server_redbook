@@ -11,7 +11,7 @@
 pip install Django
 pip install pyjwt
 pip install django-cors-headers
-pip insatll mysqlclient
+pip install mysqlclient
 ```
 
 #### 使用
