@@ -1,3 +1,5 @@
+
+
 ### Django后端
 #### 我的个人博客
 [回锅炒辣椒的个人博客](https://www.xsblog.site/)
@@ -12,6 +14,7 @@ pip install Django
 pip install pyjwt
 pip install django-cors-headers
 pip install mysqlclient
+pip install Pillow
 ```
 
 #### 使用
